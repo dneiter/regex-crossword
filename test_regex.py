@@ -27,6 +27,11 @@ def main():
     assert re.match('MMORHHO')
     assert not re.match('MMORHHH')
     assert re.match('ORHH')
+    print "===================================="
+
+    re = Regex.compile('((A)\\2)\\1')
+    re.display()
+    assert re.match('AAAA')
 
     return 0
 

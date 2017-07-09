@@ -215,17 +215,17 @@ class RegexBuilder(object):
         return token, regex
 
     def _compileToken(self, token):
-        if token[0] == '(':
-            compiled = self._compileRegex(token[1:-1])
-            self.group_count += 1
-            compiled[0].begins_group = self.group_count
-            compiled[1].ends_group = self.group_count
-            return compiled
-
         beg_node = self._createNode()
         match_node = self._createNode()
 
-        if token[0] == '[':
+        if token[0] == '(':
+            self.group_count += 1
+            beg_node.begins_group = self.group_count
+            match_node.ends_group = self.group_count
+            compiled = self._compileRegex(token[1:-1])
+            beg_node.addImplied(compiled[0])
+            compiled[1].addImplied(match_node)
+        elif token[0] == '[':
             # TODO: handle dashes
             to_match = []
             for c in token[1:-1]:
