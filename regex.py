@@ -60,22 +60,7 @@ class Regex(object):
 
             for nxt in node.implied:
                 visit(nxt, pos, groups)
-                
-            if pos >= len(input):
-                continue
-                
-            c = input[pos]
-            # match wildcard in regex
-            for nxt in node.edges.get('.') or []:
-                visit(nxt, pos + 1, self._extendGroups(groups, c))
-            # match wildcard in input
-            if c == '.':
-                for ec, edges in node.edges.iteritems():
-                    for nxt in edges:
-                        visit(nxt, pos + 1, self._extendGroups(groups, c))
-            else:
-                for nxt in node.edges.get(c) or []:
-                    visit(nxt, pos + 1, self._extendGroups(groups, c))
+
             # match groups
             for gr, edges in node.matchGroupEdges.iteritems():
                 group = groups[gr - 1]                
@@ -92,6 +77,23 @@ class Regex(object):
                 if group_match:
                     for nxt in edges:
                         visit(nxt, pos + len(group) - 2, cur_groups)
+                
+            if pos >= len(input):
+                continue
+                
+            c = input[pos]
+            # match wildcard in regex
+            for nxt in node.edges.get('.') or []:
+                visit(nxt, pos + 1, self._extendGroups(groups, c))
+            if c == '.':
+                # match wildcard in input
+                for ec, edges in node.edges.iteritems():
+                    for nxt in edges:
+                        visit(nxt, pos + 1, self._extendGroups(groups, c))
+            else:
+                # match regular characters on both sides
+                for nxt in node.edges.get(c) or []:
+                    visit(nxt, pos + 1, self._extendGroups(groups, c))
             
         return False
 
